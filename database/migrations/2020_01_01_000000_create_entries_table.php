@@ -13,19 +13,21 @@ class CreateEntriesTable extends Migration
      */
     public function up()
     {
-        Schema::create('entries', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('site');
-            $table->unsignedInteger('origin_id')->nullable();
-            $table->boolean('published')->default(true);
-            $table->string('status');
-            $table->string('slug');
-            $table->string('uri')->nullable();
-            $table->string('date')->nullable();
-            $table->string('collection');
-            $table->json('data');
-            $table->timestamps();
-        });
+        if (config('statamic-eloquent-driver.entries.enabled', true) && !config('statamic-eloquent-driver.entries.string_id', false)) {
+            Schema::create('entries', function (Blueprint $table) {
+                $table->increments('id');
+                $table->string('site');
+                $table->unsignedInteger('origin_id')->nullable();
+                $table->boolean('published')->default(true);
+                $table->string('status');
+                $table->string('slug');
+                $table->string('uri')->nullable();
+                $table->string('date')->nullable();
+                $table->string('collection');
+                $table->json('data');
+                $table->timestamps();
+            });
+        }
     }
 
     /**

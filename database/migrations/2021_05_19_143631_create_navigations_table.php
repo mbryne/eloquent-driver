@@ -13,16 +13,18 @@ class CreateNavigationsTable extends Migration
      */
     public function up()
     {
-        Schema::create('navigations', function (Blueprint $table) {
-            $table->id();
-            $table->string('handle');
-            $table->string('title');
-            $table->json('collections')->nullable();
-            $table->integer('maxDepth')->nullable();
-            $table->boolean('expectsRoot')->default(false);
-            $table->string('initialPath')->nullable();
-            $table->timestamps();
-        });
+        if (config('statamic-eloquent-driver.navigations.enabled', true)) {
+            Schema::create('navigations', function (Blueprint $table) {
+                $table->id();
+                $table->string('handle');
+                $table->string('title');
+                $table->json('collections')->nullable();
+                $table->integer('maxDepth')->nullable();
+                $table->boolean('expectsRoot')->default(false);
+                $table->string('initialPath')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     /**
@@ -32,6 +34,8 @@ class CreateNavigationsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('navigations');
+        if (config('statamic-eloquent-driver.navigations.enabled', true)) {
+            Schema::dropIfExists('navigations');
+        }
     }
 }

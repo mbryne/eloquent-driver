@@ -32,13 +32,9 @@ class ServiceProvider extends AddonServiceProvider
     {
         parent::boot();
 
-        $this->mergeConfigFrom($config = __DIR__.'/../config/eloquent-driver.php', 'statamic-eloquent-driver');
-
-        if ($this->app->runningInConsole()) {
-            $this->publishes([$config => config_path('statamic-eloquent-driver.php')]);
-
-            $this->commands([ImportEntries::class]);
-        }
+        $this->loadConfig();
+        $this->loadCommands();
+        $this->loadMigrations();
     }
 
     public function register()
@@ -50,79 +46,146 @@ class ServiceProvider extends AddonServiceProvider
         $this->registerStructures();
     }
 
+
+    protected function loadConfig(): void
+    {
+        $this->mergeConfigFrom($config = __DIR__ . '/../config/eloquent-driver.php', 'statamic-eloquent-driver');
+
+        if ($this->app->runningInConsole()) {
+            $this->publishes([$config => config_path('statamic-eloquent-driver.php')]);
+        }
+    }
+
+    private function loadMigrations()
+    {
+        if (config('statamic-eloquent-driver.migrations')) {
+            $this->loadMigrationsFrom([__DIR__ . '/../database/migrations']);
+        }
+    }
+
+    protected function loadCommands(): void
+    {
+        $this->commands([
+            ImportEntries::class
+        ]);
+    }
+
     protected function registerEntries()
     {
-        Statamic::repository(EntryRepositoryContract::class, EntryRepository::class);
+        if (config('statamic-eloquent-driver.entries.enabled', true)) {
 
-        $this->app->bind(EntryQueryBuilder::class, function ($app) {
-            return new EntryQueryBuilder(
-                $app['statamic.eloquent.entries.model']::query()
-            );
-        });
+            Statamic::repository(EntryRepositoryContract::class, EntryRepository::class);
 
-        $this->app->bind('statamic.eloquent.entries.model', function () {
-            return config('statamic-eloquent-driver.entries.model');
-        });
+            $this->app->bind(EntryQueryBuilder::class, function ($app) {
+                return new EntryQueryBuilder(
+                    $app['statamic.eloquent.entries.model']::query()
+                );
+            });
+
+            $this->app->bind('statamic.eloquent.entries.model', function () {
+                return config('statamic-eloquent-driver.entries.model');
+            });
+
+        }
     }
 
     protected function registerCollections()
     {
-        Statamic::repository(CollectionRepositoryContract::class, CollectionRepository::class);
-        Statamic::repository(CollectionTreeRepositoryContract::class, CollectionTreeRepository::class);
+        if (config('statamic-eloquent-driver.collections.enabled', true)) {
 
-        $this->app->bind('statamic.eloquent.collections.model', function () {
-            return config('statamic-eloquent-driver.collections.model');
-        });
+            Statamic::repository(CollectionRepositoryContract::class, CollectionRepository::class);
 
-        $this->app->bind('statamic.eloquent.trees.model', function () {
-            return config('statamic-eloquent-driver.trees.model');
-        });
+            $this->app->bind('statamic.eloquent.collections.model', function () {
+                return config('statamic-eloquent-driver.collections.model');
+            });
+
+        }
+
+        if (config('statamic-eloquent-driver.trees.enabled', true)) {
+
+            Statamic::repository(CollectionTreeRepositoryContract::class, CollectionTreeRepository::class);
+
+            $this->app->bind('statamic.eloquent.trees.model', function () {
+                return config('statamic-eloquent-driver.trees.model');
+            });
+
+        }
     }
 
     public function registerTaxonomies()
     {
-        Statamic::repository(TaxonomyRepositoryContract::class, TaxonomyRepository::class);
-        Statamic::repository(TermRepositoryContract::class, TermRepository::class);
+        if (config('statamic-eloquent-driver.taxonomies.enabled', true)) {
 
-        $this->app->bind(TermQueryBuilder::class, function ($app) {
-            return new TermQueryBuilder(
-                $app['statamic.eloquent.terms.model']::query()
-            );
-        });
+            Statamic::repository(TaxonomyRepositoryContract::class, TaxonomyRepository::class);
 
-        $this->app->bind('statamic.eloquent.terms.model', function () {
-            return config('statamic-eloquent-driver.terms.model');
-        });
+            $this->app->bind('statamic.eloquent.taxonomies.model', function () {
+                return config('statamic-eloquent-driver.taxonomies.model');
+            });
 
-        $this->app->bind('statamic.eloquent.taxonomies.model', function () {
-            return config('statamic-eloquent-driver.taxonomies.model');
-        });
+        }
+
+        if (config('statamic-eloquent-driver.terms.enabled', true)) {
+
+            Statamic::repository(TermRepositoryContract::class, TermRepository::class);
+
+            $this->app->bind(TermQueryBuilder::class, function ($app) {
+                return new TermQueryBuilder(
+                    $app['statamic.eloquent.terms.model']::query()
+                );
+            });
+
+            $this->app->bind('statamic.eloquent.terms.model', function () {
+                return config('statamic-eloquent-driver.terms.model');
+            });
+
+        }
     }
 
     private function registerGlobals()
     {
-        Statamic::repository(GlobalRepositoryContract::class, GlobalRepository::class);
 
-        $this->app->bind('statamic.eloquent.global-sets.model', function () {
-            return config('statamic-eloquent-driver.global-sets.model');
-        });
+        if (config('statamic-eloquent-driver.global-sets.enabled', true)) {
 
-        $this->app->bind('statamic.eloquent.variables.model', function () {
-            return config('statamic-eloquent-driver.variables.model');
-        });
+            Statamic::repository(GlobalRepositoryContract::class, GlobalRepository::class);
+
+            $this->app->bind('statamic.eloquent.global-sets.model', function () {
+                return config('statamic-eloquent-driver.global-sets.model');
+            });
+
+        }
+
+        if (config('statamic-eloquent-driver.variables.enabled', true)) {
+
+            $this->app->bind('statamic.eloquent.variables.model', function () {
+                return config('statamic-eloquent-driver.variables.model');
+            });
+
+        }
+
     }
 
     private function registerStructures()
     {
-        Statamic::repository(NavigationRepositoryContract::class, NavigationRepository::class);
-        Statamic::repository(NavTreeRepositoryContract::class, NavTreeRepository::class);
 
-        $this->app->bind('statamic.eloquent.navigations.model', function () {
-            return config('statamic-eloquent-driver.navigations.model');
-        });
+        if (config('statamic-eloquent-driver.navigations.enabled', true)) {
 
-        $this->app->bind('statamic.eloquent.trees.model', function () {
-            return config('statamic-eloquent-driver.trees.model');
-        });
+            Statamic::repository(NavigationRepositoryContract::class, NavigationRepository::class);
+
+            $this->app->bind('statamic.eloquent.navigations.model', function () {
+                return config('statamic-eloquent-driver.navigations.model');
+            });
+
+        }
+
+        if (config('statamic-eloquent-driver.nav-trees.enabled', true)) {
+
+            Statamic::repository(NavTreeRepositoryContract::class, NavTreeRepository::class);
+
+            $this->app->bind('statamic.eloquent.trees.model', function () {
+                return config('statamic-eloquent-driver.trees.model');
+            });
+
+        }
+
     }
 }

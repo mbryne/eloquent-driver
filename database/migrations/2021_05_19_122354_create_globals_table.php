@@ -13,13 +13,15 @@ class CreateGlobalsTable extends Migration
      */
     public function up()
     {
-        Schema::create('global_sets', function (Blueprint $table) {
-            $table->id();
-            $table->string('handle');
-            $table->string('title');
-            $table->json('localizations');
-            $table->timestamps();
-        });
+        if (config('statamic-eloquent-driver.global-sets.enabled', true)) {
+            Schema::create('global_sets', function (Blueprint $table) {
+                $table->id();
+                $table->string('handle');
+                $table->string('title');
+                $table->json('localizations');
+                $table->timestamps();
+            });
+        }
     }
 
     /**
@@ -29,6 +31,8 @@ class CreateGlobalsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('global_sets');
+        if (config('statamic-eloquent-driver.global-sets.enabled', true)) {
+            Schema::dropIfExists('global_sets');
+        }
     }
 }

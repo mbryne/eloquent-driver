@@ -13,13 +13,15 @@ class CreateTaxonomiesTable extends Migration
      */
     public function up()
     {
-        Schema::create('taxonomies', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('handle');
-            $table->string('title');
-            $table->json('sites')->nullable();
-            $table->timestamps();
-        });
+        if (config('statamic-eloquent-driver.taxonomies.enabled', true)) {
+            Schema::create('taxonomies', function (Blueprint $table) {
+                $table->increments('id');
+                $table->string('handle');
+                $table->string('title');
+                $table->json('sites')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     /**
@@ -29,6 +31,8 @@ class CreateTaxonomiesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('taxonomies');
+        if (config('statamic-eloquent-driver.taxonomies.enabled', true)) {
+            Schema::dropIfExists('taxonomies');
+        }
     }
 }
