@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 use Statamic\Contracts\Entries\CollectionRepository as CollectionRepositoryContract;
 use Statamic\Contracts\Entries\EntryRepository as EntryRepositoryContract;
+use Statamic\Eloquent\Entries\EntryModel;
 use Statamic\Eloquent\Entries\UuidEntryModel;
 use Statamic\Facades\Entry;
 use Statamic\Stache\Repositories\CollectionRepository;
@@ -67,8 +68,8 @@ class ImportEntries extends Command
 
     private function toModel($entry)
     {
-        return new UuidEntryModel([
-            'id' => $entry->id(),
+        return new EntryModel([
+//            'id' => $entry->id(),
             'origin_id' => optional($entry->origin())->id(),
             'site' => $entry->locale(),
             'slug' => $entry->slug(),
