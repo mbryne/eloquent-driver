@@ -75,7 +75,7 @@ class Entry extends FileEntry
             return $this->origin;
         }
 
-        if (! $this->model->origin) {
+        if (! $this->model || ! $this->model->origin) {
             return null;
         }
 
