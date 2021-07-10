@@ -11,6 +11,7 @@ use Statamic\Contracts\Structures\NavTreeRepository as NavTreeRepositoryContract
 use Statamic\Contracts\Taxonomies\TaxonomyRepository as TaxonomyRepositoryContract;
 use Statamic\Contracts\Taxonomies\TermRepository as TermRepositoryContract;
 use Statamic\Eloquent\Collections\CollectionRepository;
+use Statamic\Eloquent\Commands\ImportCollections;
 use Statamic\Eloquent\Commands\ImportEntries;
 use Statamic\Eloquent\Entries\EntryQueryBuilder;
 use Statamic\Eloquent\Entries\EntryRepository;
@@ -66,7 +67,8 @@ class ServiceProvider extends AddonServiceProvider
     protected function loadCommands(): void
     {
         $this->commands([
-            ImportEntries::class
+            ImportEntries::class,
+            ImportCollections::class
         ]);
     }
 

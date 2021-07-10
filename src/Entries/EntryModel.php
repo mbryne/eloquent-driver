@@ -12,8 +12,8 @@ class EntryModel extends Eloquent
     protected $table = 'entries';
 
     protected $casts = [
-        'date' => 'datetime',
-        'data' => 'json',
+        'date'      => 'datetime',
+        'data'      => 'json',
         'published' => 'bool',
     ];
 
